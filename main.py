@@ -19,11 +19,14 @@ tab_bar.add(activities_tab, text='Activities')
 scroll_frame = tk.LabelFrame(activities_tab)
 inner_frame = tk.Canvas(scroll_frame)
 inner_frame.pack(side='left', fill='both', expand='yes')
+
+# Add a scrollbar and allow it to actually scroll through a frame
 scrollbar = ttk.Scrollbar(scroll_frame, orient='vertical', command=inner_frame.yview)
 scrollbar.pack(side='right', fill='y')
-
 inner_frame.configure(yscrollcommand=scrollbar.set)
 inner_frame.bind('<Configure>', lambda e: inner_frame.configure(scrollregion=inner_frame.bbox('all')))
+
+# activities_frame is a Frame object we can any object we want to
 activities_frame = tk.Frame(inner_frame)
 activities_frame.pack()
 inner_frame.create_window((0,0), window=activities_frame, anchor='nw')
