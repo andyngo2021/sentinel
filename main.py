@@ -1,9 +1,12 @@
 import tkinter as tk 
 from tkinter import ttk 
+from tkinter import simpledialog
+
+activities = []
 
 root = tk.Tk()
 root.title('Sentinel')
-root.geometry('500x500')
+root.geometry('500x300')
 
 # Create a bar to hold tabs in
 tab_bar = ttk.Notebook(root)
@@ -15,32 +18,25 @@ tab_bar.add(main_tab, text='Main Menu')
 # Activities Tab - Add/Delete activities
 activities_tab = ttk.Frame(tab_bar)
 tab_bar.add(activities_tab, text='Activities')
-# Scrolling Frame 
-scroll_frame = tk.LabelFrame(activities_tab)
-inner_frame = tk.Canvas(scroll_frame)
-inner_frame.pack(side='left', fill='both', expand='yes')
 
-# Add a scrollbar and allow it to actually scroll through a frame
-scrollbar = ttk.Scrollbar(scroll_frame, orient='vertical', command=inner_frame.yview)
-scrollbar.pack(side='right', fill='y')
-inner_frame.configure(yscrollcommand=scrollbar.set)
-inner_frame.bind('<Configure>', lambda e: inner_frame.configure(scrollregion=inner_frame.bbox('all')))
+# Functions needed for Listbox buttons
+def add_activity():
+    activity_name = simpledialog.askstring("Add Activity", "What is the name of the activity?")
+    activity_list.insert(tk.END, activity_name)
+    activities.append(activity_name)
 
-# activities_frame is a Frame object we can any object we want to
-activities_frame = tk.Frame(inner_frame)
-activities_frame.pack()
-inner_frame.create_window((0,0), window=activities_frame, anchor='nw')
-scroll_frame.pack(fill='both', expand='yes', padx=10, pady=10)
- 
-# Add activites to the scrolling frame
-for i in range(50):
-    tk.Button(activities_frame, text='Button ' +  str(i)).pack()
+def delete_selected_activity():
+    index = activity_list.curselection()
+    activities.pop(index[0])
+    activity_list.delete(index)
 
-# Bar that holds the save changes button
-bottom_bar = tk.LabelFrame(activities_tab)
-bottom_bar.pack(fill='both', expand='yes', padx=10, pady=10)
-save_changes_btn = tk.Button(bottom_bar, text='Save Changes')
-save_changes_btn.grid(row=0, column=0, padx=15, pady=15)
+content = tk.StringVar()
+add_btn = tk.Button(activities_tab, text="Add Activity", command=add_activity)
+del_btn = tk.Button(activities_tab, text="Delete Activity", command=delete_selected_activity)
+activity_list = tk.Listbox(activities_tab)
+activity_list.pack(padx=15, pady=15, fill='x')
+add_btn.pack()
+del_btn.pack()
 
 
 # Settings Tab - Control the frequency, etc.
