@@ -10,6 +10,7 @@ import pyglet
 pyglet.font.add_file('Poppins-SemiBold.ttf')
 POPPINS = ('Poppins SemiBold', 25)
 
+
 # Holds a list of activities the user enters
 activities = []
 
@@ -18,12 +19,18 @@ root = tk.Tk()
 root.title('Sentinel')
 # Size of the window (wxh)
 root.geometry('550x300')
+# Set the icon
+root.iconphoto(False, tk.PhotoImage(file='icon.png'))
+
+# Custom style for background
+s = ttk.Style()
+s.configure('new.TFrame', background='#cae8e0')
 
 # Create a bar to hold tabs in
 tab_bar = ttk.Notebook(root)
 
 # Main Tab - Start/Pause the reminders
-main_tab = ttk.Frame(tab_bar)
+main_tab = ttk.Frame(tab_bar, style='new.TFrame')
 tab_bar.add(main_tab, text='Main Menu')
 
 # Creates a thread that can be stopped/started
@@ -53,9 +60,6 @@ def start():
 def on_closing():
     # Call on the method to write activities into a txt file
     save_changes()
-    # Write the current button state into the text file
-    with open('startup.txt', 'w+') as fout:
-        fout.write(str(start_up.get()))
     root.destroy()
 
 
@@ -66,7 +70,7 @@ stop_btn.pack(side='right', padx=25)
 
 
 # Activities Tab - Add/Delete activities
-activities_tab = ttk.Frame(tab_bar)
+activities_tab = ttk.Frame(tab_bar, style='new.TFrame')
 tab_bar.add(activities_tab, text='Activities')
 
 # Functions needed for Listbox buttons
@@ -92,25 +96,6 @@ activity_list.pack(padx=15, pady=15, fill='x')
 add_btn.pack(side='left', padx=15)
 del_btn.pack(side='right', padx=15)
 
-
-# Settings Tab - Control the frequency, etc.
-settings_tab = ttk.Frame(tab_bar)
-tab_bar.add(settings_tab, text='Settings')
-
-def enable_on_startup(value):
-    state = value.get()
-    if state:
-        # Then make THIS python file execute on system start up
-        pass
-    else:
-        # Then DONT' have it start on startup
-        pass
-
-start_up = tk.IntVar()
-startup_btn = tk.Checkbutton(settings_tab, text=' Automatically start on startup', variable=start_up, onvalue=1, offvalue=0, command=lambda:enable_on_startup(start_up))
-startup_btn.pack()
-
-
 # Add the tab_bar object to root
 tab_bar.pack(expand=1, fill='both')
 
@@ -121,17 +106,6 @@ def on_open():
         for line in fin.readlines():
             activities.append(line.strip())
             activity_list.insert(tk.END, line.strip())
-    # Read in previous button state for startup
-    with open('startup.txt', 'r') as fin:
-        global start_up
-        try:
-            num = int(fin.readline().strip())
-            start_up.set(num)
-        except:
-            pass
-
-
-
 
 
 # Initialize buttons and stuff
