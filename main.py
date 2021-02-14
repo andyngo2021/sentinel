@@ -7,7 +7,7 @@ from tkinter import font as tkFont
 import pyglet
 
 # Load in the Poppins font
-pyglet.font.add_file('Poppins-SemiBold.ttf')
+pyglet.font.add_file('Assets/Poppins-SemiBold.ttf')
 POPPINS = ('Poppins SemiBold', 25)
 
 
@@ -20,7 +20,7 @@ root.title('Sentinel')
 # Size of the window (wxh)
 root.geometry('550x300')
 # Set the icon
-root.iconphoto(False, tk.PhotoImage(file='icon.png'))
+root.iconphoto(False, tk.PhotoImage(file='Assets/icon.png'))
 
 # Custom style for background
 s = ttk.Style()
@@ -41,7 +41,7 @@ sentinel_thread.daemon = True
 # This method saves the current activities to a text file
 def save_changes():
     try:
-        with open('activities.txt', 'w+') as out:
+        with open('Assets/activities.txt', 'w+') as out:
             for activity in activities:
                 out.write(activity + '\n')
     except:
@@ -101,8 +101,9 @@ tab_bar.pack(expand=1, fill='both')
 
 
 def on_open():
+    global activities
     # Read in the saved activities
-    with open('activities.txt', 'r') as fin:
+    with open('Assets/activities.txt', 'r') as fin:
         for line in fin.readlines():
             activities.append(line.strip())
             activity_list.insert(tk.END, line.strip())
