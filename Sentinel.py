@@ -13,8 +13,8 @@ class Sentinel(threading.Thread):
     
     def run(self):
         while True:
-            self.toaster.show_toast('Time to take a break!', random.choice(self.activities), icon_path='icon.ico', duration=10)
-            time.sleep(5)
+            self.toaster.show_toast('Time to take a break!', 'Either stand up look away from your screen for 20 seconds, or do this:\n' + random.choice(self.activities), icon_path='icon.ico', duration=10)
+            time.sleep(1200) # Every 20 minutes
         
         while toaster.notification_active():
             time.sleep(0.1)

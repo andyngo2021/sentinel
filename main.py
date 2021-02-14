@@ -3,12 +3,21 @@ from tkinter import ttk
 from tkinter import simpledialog
 from Sentinel import Sentinel
 import sys
+from tkinter import font as tkFont
+import pyglet
 
+# Load in the Poppins font
+pyglet.font.add_file('Poppins-SemiBold.ttf')
+POPPINS = ('Poppins SemiBold', 25)
+
+# Holds a list of activities the user enters
 activities = []
 
+# Instantiate a tk object
 root = tk.Tk()
 root.title('Sentinel')
-root.geometry('500x300')
+# Size of the window (wxh)
+root.geometry('550x300')
 
 # Create a bar to hold tabs in
 tab_bar = ttk.Notebook(root)
@@ -17,29 +26,45 @@ tab_bar = ttk.Notebook(root)
 main_tab = ttk.Frame(tab_bar)
 tab_bar.add(main_tab, text='Main Menu')
 
-
+# Creates a thread that can be stopped/started
 sentinel_thread = Sentinel(activities)
 # Allows us to kill threads with the exit of the main program
 sentinel_thread.daemon = True
 
+# This method saves the current activities to a text file
 def save_changes():
-    # This method saves the current activities to a text file
-    with open('activities.txt', 'w+') as out:
-        for activity in activities:
-            out.write(activity + '\n')
-    
+    try:
+        with open('activities.txt', 'w+') as out:
+            for activity in activities:
+                out.write(activity + '\n')
+    except:
+        pass
 
+# This method starts the Sentinel Thread, allowing toast notifications to appear in the background while the main Tk window runs
 def start():
-    sentinel_thread.start()
+    if len(activities)==0:
+        # Notify that they need to add activities
+        tk.messagebox.showwarning(title='NOT ENOUGH ACTIVITIES', message='Please add at least one activity before starting Sentinel!')
+        print('Insufficient amount of activities')
+    else:
+        sentinel_thread.start()
 
-def stop():
+# This method is called when you press the X button :D
+def on_closing():
+    # Call on the method to write activities into a txt file
     save_changes()
-    sys.exit()
+    # Write the current button state into the text file
+    with open('startup.txt', 'w+') as fout:
+        fout.write(str(start_up.get()))
+    root.destroy()
 
-start_btn = tk.Button(main_tab, text="Start", command=start)
-stop_btn = tk.Button(main_tab, text="Exit", command=stop)
-start_btn.pack()
-stop_btn.pack()
+
+start_btn = tk.Button(main_tab, text="START", command=start, padx=45, pady=30, bg='#71ff4d', font=POPPINS)
+stop_btn = tk.Button(main_tab, text="EXIT", command=on_closing, padx=70, pady=30, bg='#ff584d', font=POPPINS)
+start_btn.pack(side='left', padx=25)
+stop_btn.pack(side='right', padx=25)
+
+
 # Activities Tab - Add/Delete activities
 activities_tab = ttk.Frame(tab_bar)
 tab_bar.add(activities_tab, text='Activities')
@@ -56,17 +81,16 @@ def delete_selected_activity():
         activities.pop(index[0])
         activity_list.delete(index)
     except:
-        pass
-
+        tk.messagebox.showwarning(title='Error', message='Please select an activity to delete!')
 
 
 content = tk.StringVar()
-add_btn = tk.Button(activities_tab, text="Add Activity", command=add_activity)
-del_btn = tk.Button(activities_tab, text="Delete Activity", command=delete_selected_activity)
+add_btn = tk.Button(activities_tab, text="Add Activity", command=add_activity, padx=60, pady=10, bg='#71ff4d', font=('Poppins SemiBold', 10))
+del_btn = tk.Button(activities_tab, text="Delete Activity", command=delete_selected_activity, padx=60, pady=10, bg='#ff584d', font=('Poppins SemiBold', 10))
 activity_list = tk.Listbox(activities_tab)
 activity_list.pack(padx=15, pady=15, fill='x')
-add_btn.pack()
-del_btn.pack()
+add_btn.pack(side='left', padx=15)
+del_btn.pack(side='right', padx=15)
 
 
 # Settings Tab - Control the frequency, etc.
@@ -84,7 +108,7 @@ def enable_on_startup(value):
 
 start_up = tk.IntVar()
 startup_btn = tk.Checkbutton(settings_tab, text=' Automatically start on startup', variable=start_up, onvalue=1, offvalue=0, command=lambda:enable_on_startup(start_up))
-# startup_btn.pack()
+startup_btn.pack()
 
 
 # Add the tab_bar object to root
@@ -106,13 +130,7 @@ def on_open():
         except:
             pass
 
-def on_closing():
-    # Call on the method to write activities into a txt file
-    save_changes()
-    # Write the current button state into the text file
-    with open('startup.txt', 'w+') as fout:
-        fout.write(str(start_up.get()))
-    root.destroy()
+
 
 
 
@@ -120,4 +138,5 @@ def on_closing():
 on_open()
 # Main loop that allows to the program to run
 root.protocol('WM_DELETE_WINDOW', on_closing)
+root.resizable(False, False)
 root.mainloop()
